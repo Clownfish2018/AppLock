@@ -138,8 +138,11 @@ public class AppCheckServices extends Service {
 //        LayoutInflater layoutInflater = LayoutInflater.from(mContext);
 //        View promptsView = layoutInflater.inflate(R.layout.best_numboard_land, null);
 //        this.initPromptsView(promptsView);
-        if (this.mDialog != null && this.mDialog.isShowing())
+        if (this.mDialog != null && this.mDialog.isShowing()) {
             return;
+//            this.mDialog.dismiss();
+//            this.mDialog = null;
+        }
 
         this.mDialog = new PwdLockingDialog2(this.mContext);
         mDialog.show();

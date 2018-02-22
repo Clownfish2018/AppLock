@@ -3,7 +3,7 @@
     android:id="@+id/numboard_whole_layout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/num_background"
+    android:background="@android:color/white"
     android:tag="0x7f0700a7">
 
     <EditText
@@ -31,11 +31,21 @@
         android:textColorHint="#77ffffff"
         android:textSize="16.0sp" />
 
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/numboard_pwd_edittext"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:text="@string/enter_pwd"
+        android:textSize="18sp" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="70dp"
-        android:layout_marginRight="70dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:layout_below="@id/numboard_pwd_edittext">
 
         <LinearLayout
@@ -105,7 +115,7 @@
             <Button
                 android:id="@+id/btn_cancel"
                 style="@style/style_btn_dialer"
-                android:text="&lt;" />
+                android:text="EXIT" />
 
             <Button
                 android:id="@+id/btn_0"
@@ -114,7 +124,7 @@
             <Button
                 android:id="@+id/btn_del"
                 style="@style/style_btn_dialer"
-                android:text="X" />
+                android:text="DEL" />
         </LinearLayout>
     </RelativeLayout>
     <!--<View-->

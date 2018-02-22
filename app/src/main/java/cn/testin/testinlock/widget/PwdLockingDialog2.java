@@ -18,6 +18,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import cn.testin.testinlock.R;
 
 /**
@@ -174,8 +177,42 @@ public class PwdLockingDialog2 extends Dialog {
     }
 
     @Override
+    public void show() {
+        super.show();
+        Log.d(TAG, "SHOW=" + this.toString());
+        new Thread() {
+            @Override
+            public void run() {
+                while (isShowing()) {
+                    try {
+                        Object service = PwdLockingDialog2.this.getContext().getSystemService("statusbar");
+                        Class<?> statusbarManager = Class.forName("android.app.StatusBarManager");
+                        Method collapse = statusbarManager.getMethod("collapsePanels");
+                        collapse.invoke(service);
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }.start();
+    }
+
+    @Override
     public void dismiss() {
         super.dismiss();
+        Log.d(TAG, "DISMISS=" + this.toString());
     }
     //    @Override
 //    public void onBackPressed() {

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TestinLock</string>
+    <string name="enter_pwd">Please enter password to contniue:</string>
 </resources>
