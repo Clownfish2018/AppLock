@@ -16,7 +16,7 @@ public abstract class AbstractService implements IService {
 
     protected Context mContext;
 
-    private Timer mTimer = new Timer(this.getClass().getSimpleName() + "Timer");
+    private Timer mTimer;
     private TimerTask mTimerTask = new TimerTask() {
         @Override
         public void run() {
@@ -30,11 +30,17 @@ public abstract class AbstractService implements IService {
 
     @Override
     public void start() {
-        this.mTimer.scheduleAtFixedRate(this.mTimerTask, DELAY_TIME, INTERVAL);
+        if (this.mTimer == null) {
+            this.mTimer = new Timer(this.getClass().getSimpleName() + "Timer");
+            this.mTimer.scheduleAtFixedRate(this.mTimerTask, DELAY_TIME, INTERVAL);
+        }
     }
 
     @Override
     public void stop() {
-        this.mTimer.cancel();
+        if (this.mTimer != null) {
+            this.mTimer.cancel();
+            this.mTimer = null;
+        }
     }
 }
