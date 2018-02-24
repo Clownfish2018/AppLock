@@ -7,7 +7,6 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions"/>
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
-    <!--<uses-permission android:name="android.permission.STATUS_BAR" tools:ignore="ProtectedPermissions"/>-->
 
     <application
         android:allowBackup="true"
@@ -19,6 +18,13 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="cn.testin.testinlock.PwdActivity"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="cn.testin.PwdActivity" />
             </intent-filter>
         </activity>
 

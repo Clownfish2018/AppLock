@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">TestinLock</string>
     <string name="enter_pwd">Please enter password to contniue:</string>
+    <string name="str_dev_pwd">Current device password:</string>
 </resources>

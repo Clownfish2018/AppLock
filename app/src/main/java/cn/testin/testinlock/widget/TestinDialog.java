@@ -13,7 +13,6 @@ import cn.testin.testinlock.R;
 /**
  * Created by qipengfei on 2/22/2018.
  */
-
 public class TestinDialog extends RelativeLayout {
     public TestinDialog(Context context) {
         super(context);

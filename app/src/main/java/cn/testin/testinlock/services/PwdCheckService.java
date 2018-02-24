@@ -7,48 +7,37 @@ import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.PixelFormat;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Message;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.TreeMap;
 
-import cn.testin.testinlock.R;
+import cn.testin.testinlock.AppLockApplication;
 import cn.testin.testinlock.widget.PwdLockingDialog;
-import cn.testin.testinlock.widget.PwdLockingDialog2;
 
 /**
  * Created by qipengfei on 2/14/2018.
  */
 public class PwdCheckService extends AbstractService {
-    private static long DELAY_TIME = 0l;
-    private static long INTERVAL = 100l;
+    private static final long DELAY_TIME = 0l;
+    private static final long INTERVAL = 100l;
     private final int mLayoutType = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ?
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_PHONE;
 
@@ -74,7 +63,11 @@ public class PwdCheckService extends AbstractService {
         params.gravity = Gravity.TOP | Gravity.CENTER;
         params.x = ((this.mContext.getResources().getDisplayMetrics().widthPixels) / 2);
         params.y = ((this.mContext.getResources().getDisplayMetrics().heightPixels) / 2);
-        windowManager.addView(this.mIvBackgound, params);
+        this.windowManager.addView(this.mIvBackgound, params);
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.mContext);
+        String devicePassword = sp.getString("devPwd", "UNKNOWN");
+        AppLockApplication.sDevicePassword = devicePassword;
     }
 
     @Override
@@ -82,23 +75,34 @@ public class PwdCheckService extends AbstractService {
 
     @Override
     public void doWork() {
+        //Not connected
+        if (!AppLockApplication.usbConnected || !AppLockApplication.usbConnected) {
+            if (this.mDialog != null && this.mDialog.isShowing() && this.mIvBackgound != null)
+                this.mIvBackgound.post(new Runnable() {
+                    public void run() {
+                        hideDialog();
+                    }
+                });
+            return;
+        }
         final String[] topActivities = PwdCheckService.this.getTopActivities();
         if (topActivities == null || topActivities.length == 0)
             return;
+
         if (getDefaultSettings().contains(topActivities[0])) {
-            if (mIvBackgound != null && !mLastPkgName.equals(topActivities[0])) {
-                mIvBackgound.post(new Runnable() {
+            if (this.mIvBackgound != null && !this.mLastPkgName.equals(topActivities[0])) {
+                this.mIvBackgound.post(new Runnable() {
                     public void run() {
 //                            if (!mLastPkgName.equals(topActivities[0])) {
                         showDialog();
-                        mLastPkgName = topActivities[0];
+                        PwdCheckService.this.mLastPkgName = topActivities[0];
 //                            }
                     }
                 });
             }
         } else {
-            if (mIvBackgound != null) {
-                mIvBackgound.post(new Runnable() {
+            if (this.mIvBackgound != null) {
+                this.mIvBackgound.post(new Runnable() {
                     public void run() {
                         hideDialog();
                     }
@@ -118,15 +122,15 @@ public class PwdCheckService extends AbstractService {
     @Override
     public void stop() {
         super.stop();
-        if (mIvBackgound != null) {
-            windowManager.removeView(mIvBackgound);
+        if (this.mIvBackgound != null) {
+            this.windowManager.removeView(this.mIvBackgound);
         }
         /**** added to fix the bug of view not attached to window manager ****/
         try {
-            if (mDialog != null) {
-                if (mDialog.isShowing()) {
-                    mDialog.dismiss();
-                }
+            if (this.mDialog != null) {
+                if (this.mDialog.isShowing())
+                    this.mDialog.dismiss();
+                this.mDialog = null;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -136,8 +140,9 @@ public class PwdCheckService extends AbstractService {
     private void hideDialog() {
         this.mLastPkgName = "";
         try {
-            if (mDialog != null && this.mDialog.isShowing()) {
-                this.mDialog.dismiss();
+            if (this.mDialog != null) {
+                if (this.mDialog.isShowing())
+                    this.mDialog.dismiss();
                 this.mDialog = null;
             }
         } catch (Exception e) {
@@ -147,7 +152,7 @@ public class PwdCheckService extends AbstractService {
 
     private void showDialog() {
 //        LayoutInflater layoutInflater = LayoutInflater.from(mContext);
-//        View promptsView = layoutInflater.inflate(R.layout.best_numboard_land, null);
+//        View promptsView = layoutInflater.inflate(R.layout.layout_pwd_locking_dialog, null);
 //        this.initPromptsView(promptsView);
         if (this.mDialog != null && this.mDialog.isShowing()) {
             return;
@@ -155,7 +160,7 @@ public class PwdCheckService extends AbstractService {
 //            this.mDialog = null;
         }
 
-        this.mDialog = new PwdLockingDialog2(this.mContext);
+        this.mDialog = new PwdLockingDialog(this.mContext);
         this.mDialog.show();
     }
 
